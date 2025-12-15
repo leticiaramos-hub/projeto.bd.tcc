@@ -12,3 +12,31 @@ export async function GET(){
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
+
+export async function POST(requisicao) {
+
+    try {
+
+        const {nome_completo, telefone, email, data_nasc, senha_hash } = await requisicao.json();
+
+        if (!nome_completo || !telefone || !email || !data_nasc || !senha_hash) {
+            return NextResponse.json(
+                { error:  "Campos obrigatórios: nome_completo, telefone, email, data_nasc, senha_hash" },
+                { status: 400 }
+            );
+        }
+
+
+        await pool.query(
+            `INSERT INTO cliente (nome_completo, telefone, email, data_nasc, senha_hash)
+            VALUES ($1, $2, $3, $4, $5)`,
+            [nome_completo, telefone, email, data_nasc, senha_hash]
+        );
+
+        return NextResponse.json({ message: "Cliente inserido com sucesso" }, { status: 201 })
+
+    } catch (error) {
+
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    }
+}
